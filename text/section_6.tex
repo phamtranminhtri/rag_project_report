@@ -1,1 +1,39 @@
 \section{Implementation: LangChain, Text-to-speech, Speech-to-text}
+
+\subsection{Building an AI Agent Chatbot with LangChain}
+
+We implement AI agent chatbot using the LangChain framework, designed to support a music-related website through Retrieval-Augmented Generation (RAG) combined with speech-based interaction. LangChain enables the construction of agentic systems by integrating large language models (LLMs) with external tools, memory, and retrieval mechanisms, allowing the chatbot to reason, decide actions, and iteratively solve user queries.
+
+An \textbf{AI agent} in LangChain is defined as a system that combines a language model with a set of tools, enabling it to select and invoke appropriate tools based on the task context. Tools act as functional interfaces that extend the model’s capabilities beyond pure text generation, such as searching documents or querying the web.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\linewidth]{image/6_01.png}
+    \caption{AI Agent}
+    % \label{fig:enter-label}
+\end{figure}
+
+
+
+\subsubsection{RAG Agent Architecture}
+
+The chatbot is built around a RAG agent architecture consisting of three main stages: indexing, retrieval, and response generation. During the indexing phase, nearly 100 Wikipedia articles related to {Music} are loaded using LangChain’s \texttt{WikipediaLoader}. These documents are embedded using the \texttt{gemini-embedding-001} model and stored persistently in a \texttt{Chroma} vector database, enabling efficient semantic similarity search.
+
+\subsubsection{Agent Tools}
+
+The agent is equipped with multiple tools to enhance its reasoning and information access:
+\begin{itemize}
+    \item \textbf{Context Retrieval Tool}: Retrieves the top-$k$ (with $k=10$) most relevant documents from the Chroma vector store based on semantic similarity.
+    \item \textbf{Web Search Tool}: Uses DuckDuckGo to fetch real-time search results, including URLs, titles, and snippets, enabling access to up-to-date information.
+    \item \textbf{Web Loader Tool}: Employs LangChain’s \texttt{WebBaseLoader} to extract and process raw HTML content from selected web pages.
+\end{itemize}
+
+These tools are wrapped and exposed to the agent, allowing it to dynamically decide whether to rely on internal knowledge, retrieved documents, or external web sources.
+
+\subsubsection{Agent Configuration and Memory}
+
+The agent is initialized with a system prompt that defines its role and behavior. The conversational backbone uses the \texttt{gemini-2.5-flash} chat model for response generation. To maintain contextual coherence, short-term memory is incorporated, enabling the agent to remember and reference previous turns within a single conversation thread.
+
+
+\subsection{Text-to-speech}
+\subsection{Speech-to-text}
