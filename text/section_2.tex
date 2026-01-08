@@ -1,1 +1,57 @@
 \section{Prerequisite: ANN, Transformer, LLM}
+
+\subsection{Artificial neural network}
+
+\subsection{Transformer architecture}
+
+\subsection{Large language model}
+
+
+Large Language Models (LLMs) are advanced neural network models designed to understand, generate, and manipulate natural language at scale. They are typically built upon the Transformer architecture and trained on massive text corpora, enabling them to perform a wide range of Natural Language Processing (NLP) tasks such as text generation, question answering, summarization, and dialogue systems.
+
+\subsubsection{Evolution and Architecture}
+
+The development of LLMs has progressed from traditional statistical language models (e.g., n-gram models) to recurrent architectures such as Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks, and ultimately to Transformer-based models. Transformers address the limitations of sequential computation and long-term dependency learning through the self-attention mechanism, making them highly scalable and effective for large datasets.
+
+Based on their architectural design, LLMs can be categorized into three main types:
+\begin{itemize}
+    \item \textbf{Decoder-only models (causal language models):} These models, such as GPT and LLaMA, predict the next token in a sequence and are primarily used for text generation tasks.
+    \item \textbf{Encoder-only models (bidirectional language models):} Models like BERT, RoBERTa, and DistilBERT focus on learning contextual representations of text and are widely used for text understanding tasks such as classification and semantic similarity.
+    \item \textbf{Encoder--Decoder models (sequence-to-sequence):} Examples include T5 and BART, which encode the input sequence and then decode it into an output sequence, making them suitable for machine translation, summarization, and question answering.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{image/2_3_01.png}
+    \caption{Transformer architectures}
+    % \label{fig:enter-label}
+\end{figure}
+
+\subsubsection{Pretraining and Fine-Tuning}
+
+LLMs are first trained during a {pretraining} phase using large-scale datasets such as Common Crawl, Wikipedia, and book corpora. Common pretraining objectives include autoregressive language modeling, masked language modeling, and denoising tasks. These objectives allow the model to learn grammar, semantics, and world knowledge from raw text.
+
+After pretraining, LLMs are adapted to specific tasks through {fine-tuning}. This process may include Supervised Fine-Tuning (SFT), where human-labeled prompt--response pairs are used, and Reinforcement Learning from Human Feedback (RLHF), where human preferences guide the optimization of model outputs. Parameter-Efficient Fine-Tuning (PEFT) techniques such as LoRA and QLoRA are often employed to reduce computational cost while maintaining performance.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{image/2_3_03.png}
+    \caption{RLHF for ChatGPT}
+    % \label{fig:enter-label}
+\end{figure}
+
+
+
+\subsubsection{LLMs in Chatbot Systems}
+
+LLMs play a central role in modern chatbot systems. To improve factual accuracy and domain specificity, Retrieval-Augmented Generation (RAG) is commonly used. In a RAG-based system, relevant documents are embedded into a vector space and stored in a vector database. When a user submits a query, the system retrieves the most relevant documents and provides them as additional context to the LLM before generating a response. This approach significantly enhances the reliability and explainability of chatbot answers.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{image/2_3_02.png}
+    \caption{Retrieval augmented generation}
+    % \label{fig:enter-label}
+\end{figure}
+
+
+In addition, prompt engineering and system instructions are used to control the behavior, style, and scope of the chatbot. For domain-specific applications such as a music information website, these techniques ensure that responses remain relevant, concise, and aligned with predefined constraints.

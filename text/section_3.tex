@@ -1,1 +1,39 @@
 \section{Agent, URAG, LangChain}
+
+\subsection{AI agent}
+
+\subsection{Unified Hybrid RAG}
+
+\subsection{Introduction to LangChain}
+
+% \subsection{LangChain Framework}
+
+LangChain is a comprehensive framework designed to support the development, deployment, and monitoring of applications powered by Large Language Models (LLMs). It provides modular components and abstractions that simplify the construction of complex LLM-based systems such as Retrieval-Augmented Generation (RAG) pipelines and agentic workflows.
+
+LangChain supports the full lifecycle of an LLM application. During the {development} phase, developers can build applications using LangChain’s core components, including prompt templates, chains, retrievers, vector stores, and integrations with third-party tools and APIs. For more advanced agentic behaviors, LangChain introduces {LangGraph}, which enables the definition of multi-step agents with explicit states, nodes, and control flows. This graph-based design allows agents to reason, invoke tools, and iterate over multiple steps in a structured and controllable manner.
+
+In the {production} phase, LangChain is complemented by {LangSmith}, a platform that provides observability, debugging, and evaluation capabilities. LangSmith allows developers to inspect prompt execution, track intermediate steps, monitor latency and costs, and systematically evaluate model outputs. These features are particularly important for RAG systems, where both retrieval quality and generation accuracy must be continuously assessed.
+
+For {deployment}, LangChain offers the LangGraph Platform, which facilitates the deployment and scaling of agentic workflows. This platform-oriented approach makes LangChain suitable not only for experimentation but also for real-world applications.
+
+Within a RAG architecture, LangChain structures the workflow into two main stages. The first stage is {indexing}, an offline process that involves loading documents, splitting them into chunks, generating embeddings using an embedding model, and storing these embeddings in a vector database. The second stage is {retrieval and generation}, which occurs at runtime: relevant document chunks are retrieved from the vector store based on the user query, combined with the query into a structured prompt, and passed to an LLM to generate a final response.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{image/3_01.png}
+    \caption{RAG - Indexing}
+    % \label{fig:enter-label}
+\end{figure}
+
+
+
+LangChain provides a flexible and extensible foundation for building RAG-based and agent-driven applications, enabling developers to integrate LLMs, retrieval systems, and external tools into a unified and production-ready framework.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{image/3_02.png}
+    \caption{RAG - Retrieval and Generation}
+    % \label{fig:enter-label}
+\end{figure}
+
+
