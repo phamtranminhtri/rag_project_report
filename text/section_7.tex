@@ -1,1 +1,371 @@
 \section{Evaluation}
+
+We need to evaluate how effective our RAG system is. We will be rating the RAG feature, not the web search tool here. As discussed in the previous section, the RAG vector store is taken from 76 Wikipedia articles about Music. We will also measure the time it take to retrieve the relevance context from the database.
+
+We use 2 type of evaluation score:
+
+\begin{enumerate}
+    \item \textbf{Cosine Similarity (0-1)}: Semantic similarity between query embeddings and document embeddings
+    \item \textbf{LLM-as-a-Judge (1-5 scale)}:
+    \begin{itemize}
+        \item 5 = Highly relevant, directly answers query
+        \item 4 = Relevant, provides useful information
+        \item 3 = Somewhat relevant, tangentially related
+        \item 2 = Minimally relevant
+        \item 1 = Not relevant
+    \end{itemize}
+\end{enumerate}
+
+We use 10 text querries: Basic factual queries (1-2), Temporal queries (3-5), Event-based queries (6-7),    Complex analytical queries (8-10)
+
+\begin{enumerate}
+    \item What are the most common musical instruments?
+    \item Explain the concept of harmony in music
+    \item How has music evolved over the centuries?
+    \item What are the characteristics of music in the Renaissance period?
+    \item When did electronic music emerge?
+    \item What impact did the invention of recording technology have on music?
+    \item How did jazz influence modern music genres?
+    \item Compare Western and Eastern musical traditions
+    \item What is the relationship between rhythm and cultural identity in music?
+    \item How do musical scales affect emotional perception?
+\end{enumerate}
+
+For each of the 10 text querries, we first retrieve the top 5 relevant documents from the vector store. Then we use the 2 method above to evaluate the relevant score of the retrieved docs. 
+
+\begin{enumerate}
+    \item For method 1, we calculate the embedding of the query and of each document, then we calculate the cosine similarity between the embedding of query with the embedding of each doc.
+    \item For method 2, we feed a prompt to the LLM to ask it to give a score based on how relevant the document is to the query. The model used is \texttt{gemini-2.5-flash}.
+    
+    \begin{lstlisting}[language=python, caption=LLM-as-a-judge]
+for i, doc in enumerate(retrieved_docs):
+    prompt = f"""Rate the relevance of the following document to the query on a scale of 1-5.
+
+Query: {query}
+
+Document Content: {doc.page_content[:500]}...
+
+Scoring scale:
+5 - Highly relevant, directly answers the query
+4 - Relevant, provides useful information
+3 - Somewhat relevant, tangentially related
+2 - Minimally relevant, barely related
+1 - Not relevant, unrelated to query
+
+Respond with ONLY the numeric score (1-5)."""
+    
+    try:
+        response = model.invoke(prompt)
+        score = int(response.content.strip())
+        scores.append(min(max(score, 1), 5))  # Ensure score is between 1-5
+    except:
+        scores.append(3)  # Default to neutral if parsing fails
+    \end{lstlisting}
+\end{enumerate}
+
+Here is the result:
+
+\begin{lstlisting}[caption={RAG score result}]
+============================================================
+Query 1: What are the most common musical instruments?
+============================================================
+
+Metrics:
+  Retrieval time: 1.732s
+  Avg similarity: 0.697
+  Avg relevance: 2.60/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.715
+    Relevance: 3/5
+    Source: https://en.wikipedia.org/wiki/Musical_instrument
+    Content: as the only system that applies to any culture and, more importantly, provides the only possible classification for each instrument. The most common c...
+
+  Document 2:
+    Similarity: 0.703
+    Relevance: 4/5
+    Source: https://en.wikipedia.org/wiki/Percussion_instrument
+    Content: === By prevalence in common knowledge ===
+It is difficult to define what is common knowledge but there are instruments percussionists and composers us...
+
+  Document 3:
+    Similarity: 0.697
+    Relevance: 2/5
+    Source: https://en.wikipedia.org/wiki/Musical_instrument
+    Content: There are many different methods of classifying musical instruments. Various methods examine aspects such as the physical properties of the instrument...
+
+============================================================
+Query 2: Explain the concept of harmony in music
+============================================================
+
+Metrics:
+  Retrieval time: 0.483s
+  Avg similarity: 0.755
+  Avg relevance: 5.00/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.773
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: Harmony refers to the "vertical" sounds of pitches in music, which means pitches that are played or sung together at the same time creates a chord. Us...
+
+  Document 2:
+    Similarity: 0.764
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music_theory
+    Content: In music, harmony is the use of simultaneous pitches (tones, notes), or chords. The study of harmony involves chords and their construction and chord ...
+
+  Document 3:
+    Similarity: 0.751
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: === Harmony ===...
+
+============================================================
+Query 3: How has music evolved over the centuries?
+============================================================
+
+Metrics:
+  Retrieval time: 0.465s
+  Avg similarity: 0.720
+  Avg relevance: 4.20/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.731
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Popular_music
+    Content: There are multiple possible explanations for many of these changes. One reason for the brevity of songs in the past was the physical capability of rec...
+
+  Document 2:
+    Similarity: 0.730
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Classical_music
+    Content: By the 20th century, stylistic unification gradually dissipated while the prominence of popular music greatly increased. Many composers actively avoid...
+
+  Document 3:
+    Similarity: 0.718
+    Relevance: 3/5
+    Source: https://en.wikipedia.org/wiki/Popular_music
+    Content: In addition to many changes in specific sounds and technologies used, there has been a shift in the content and key elements of popular music since th...
+
+============================================================
+Query 4: What are the characteristics of music in the Renaissance period?
+============================================================
+
+Metrics:
+  Retrieval time: 0.479s
+  Avg similarity: 0.724
+  Avg relevance: 4.40/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.744
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: Renaissance music (c.1400 to 1600) was more focused on secular themes, such as courtly love. Around 1450, the printing press was invented, which made...
+
+  Document 2:
+    Similarity: 0.734
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Classical_music
+    Content: ==== Renaissance ====
+
+The musical Renaissance era lasted from 1400 to 1600. It was characterized by greater use of instrumentation, multiple interwea...
+
+  Document 3:
+    Similarity: 0.722
+    Relevance: 4/5
+    Source: https://en.wikipedia.org/wiki/Baroque_music
+    Content: tritone, perceived as an unstable interval, to create dissonance (it was used in the dominant seventh chord and the diminished chord). An interest in ...
+
+============================================================
+Query 5: When did electronic music emerge?
+============================================================
+
+Metrics:
+  Retrieval time: 0.571s
+  Avg similarity: 0.728
+  Avg relevance: 4.60/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.741
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Electronic_music
+    Content: The first electronic musical devices were developed at the end of the 19th century. During the 1920s and 1930s, some electronic instruments were intro...
+
+  Document 2:
+    Similarity: 0.740
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Electronic_music
+    Content: During the 1960s, digital computer music was pioneered, innovation in live electronics took place, and Japanese electronic musical instruments began t...
+
+  Document 3:
+    Similarity: 0.724
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Electronic_music
+    Content: === United States ===
+In the United States, electronic music was being created as early as 1939, when John Cage published Imaginary Landscape, No. 1, ...
+
+============================================================
+Query 6: What impact did the invention of recording technology have on music?
+============================================================
+
+Metrics:
+  Retrieval time: 0.472s
+  Avg similarity: 0.708
+  Avg relevance: 5.00/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.715
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: distributed. The introduction of the multitrack recording system had a major influence on rock music, because it could do more than record a band's pe...
+
+  Document 2:
+    Similarity: 0.712
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Popular_music
+    Content: In the 1950s and 1960s, the new invention of television began to play an increasingly important role in disseminating new popular music. Variety shows...
+
+  Document 3:
+    Similarity: 0.709
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: In the 19th century, a key way new compositions became known to the public was by the sales of sheet music, which middle class amateur music lovers wo...
+
+============================================================
+Query 7: How did jazz influence modern music genres?
+============================================================
+
+Metrics:
+  Retrieval time: 0.539s
+  Avg similarity: 0.705
+  Avg relevance: 3.60/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.719
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Rock_music
+    Content: fusion began to take its audience, but acts like Steely Dan, Frank Zappa and Joni Mitchell recorded significant jazz-influenced albums in this period,...
+
+  Document 2:
+    Similarity: 0.712
+    Relevance: 3/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: Jazz evolved and became an important genre of music over the course of the 20th century, and during the second half, rock music did the same. Jazz is ...
+
+  Document 3:
+    Similarity: 0.702
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Rock_music
+    Content: British acts to emerge in the same period from the blues scene, to make use of the tonal and improvisational aspects of jazz, included Nucleus and the...
+
+============================================================
+Query 8: Compare Western and Eastern musical traditions
+============================================================
+
+Metrics:
+  Retrieval time: 0.499s
+  Avg similarity: 0.720
+  Avg relevance: 4.40/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.734
+    Relevance: 4/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: In the West, much of the history of music that is taught deals with the Western civilization's art music, known as classical music. The history of mus...
+
+  Document 2:
+    Similarity: 0.720
+    Relevance: 4/5
+    Source: https://en.wikipedia.org/wiki/Classical_music
+    Content: Classical music generally refers to the art music of the Western world, considered to be distinct from Western folk music or popular music traditions....
+
+  Document 3:
+    Similarity: 0.715
+    Relevance: 4/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: === Asian cultures ===
+
+Asian music covers a swath of music cultures surveyed in the articles on Arabia, Central Asia, East Asia, South Asia, and Sout...
+
+============================================================
+Query 9: What is the relationship between rhythm and cultural identity in music?
+============================================================
+
+Metrics:
+  Retrieval time: 0.477s
+  Avg similarity: 0.696
+  Avg relevance: 3.20/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.709
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Tempo
+    Content: song (although this would be less likely with an experienced bandleader). Differences in tempo and its interpretation can differ between cultures, as ...
+
+  Document 2:
+    Similarity: 0.698
+    Relevance: 3/5
+    Source: https://en.wikipedia.org/wiki/Tempo
+    Content: This context-dependent perception of tempo and rhythm is explained by the principle of correlative perception, according to which data are perceived i...
+
+  Document 3:
+    Similarity: 0.695
+    Relevance: 2/5
+    Source: https://en.wikipedia.org/wiki/Music
+    Content: === Rhythm ===...
+
+============================================================
+Query 10: How do musical scales affect emotional perception?
+============================================================
+
+Metrics:
+  Retrieval time: 0.451s
+  Avg similarity: 0.705
+  Avg relevance: 3.00/5
+
+Top 3 Retrieved Documents:
+
+  Document 1:
+    Similarity: 0.709
+    Relevance: 5/5
+    Source: https://en.wikipedia.org/wiki/Music_theory
+    Content: The interrelationship of the keys most commonly used in Western tonal music is conveniently shown by the circle of fifths. Unique key signatures are a...
+
+  Document 2:
+    Similarity: 0.708
+    Relevance: 4/5
+    Source: https://en.wikipedia.org/wiki/Scale_(music)
+    Content: Tetratonic (4 notes), tritonic (3 notes), and ditonic (2 notes): generally limited to prehistoric ("primitive") music
+Scales may also be described by ...
+
+  Document 3:
+    Similarity: 0.704
+    Relevance: 2/5
+    Source: https://en.wikipedia.org/wiki/Soundtrack
+    Content: plot anticipations, and moral judgement of the characters. Furthermore, eyetracking and pupillometry studies found that film music is able to influenc...
+
+============================================================
+\end{lstlisting}
+
+Overall, we can see that the time it take to retrieve the context is acceptable (less than $1$ second for most cases). The average similarity score is around 0.7-0.75; and the average LLM judge rating varied more, around 2.6 to 5.0. LLM judge score can be pretty inconsistance and biased, or even inaccurate, so we use extra  manual inspection to check the relevance of the retrived context to the query; but generally, the LLM can be quite good at deciding which infomation is important to answer the query. 
+
+In conclusion, we can say that with our vector database of 76 Wiki articles is quite sufficient for our RAG system, and RAG did a good job at retrieving the neccesary context for the queries.
