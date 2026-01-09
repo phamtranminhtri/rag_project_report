@@ -119,6 +119,119 @@ The training process of a neural network consists of three repeated steps:
 
 \subsection{Transformer architecture}
 
+\subsubsection{Introduction and Background}
+Prior to the advent of the Transformer, sequence modeling and transduction problems, such as machine translation and language modeling, were dominated by Recurrent Neural Networks (RNNs), Long Short-Term Memory (LSTM), and Gated Recurrent Units (GRUs). However, these architectures faced several inherent limitations:
+\begin{itemize}
+    \item \textbf{Sequential Computation:} They require $O(n)$ steps to process a sequence of length $n$, preventing parallelization during training.
+    \item \textbf{Vanishing and Exploding Gradients:} Despite improvements in LSTMs, these models still struggle with gradient stability in very long sequences.
+    \item \textbf{Long-range Dependencies:} Difficulty in capturing relationships between distant tokens in a sentence.
+    \item \textbf{Efficiency Decay:} Performance significantly drops as the sequence length increases.
+\end{itemize}
+
+In 2015, the Attention mechanism was introduced as an enhancement for Seq2seq models. By 2017, the landmark paper \textit{"Attention is All You Need"} proposed the Transformer architecture, which entirely replaced recurrence with attention. The Transformer follows an \textbf{Encoder-Decoder} structure:
+\begin{itemize}
+    \item \textbf{Encoder:} Processes the input sequence and generates continuous representations.
+    \item \textbf{Decoder:} Generates the output sequence token by token, attending to the encoder's output.
+    \item Both components consist of multiple identical layers stacked to increase the model's capacity and representational power.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{image/transformer.png}
+    \caption{Transformer architecture}
+    \label{fig:transfromer}
+\end{figure}
+
+\subsubsection{Self-Attention Mechanism}
+The core of the Transformer is the \textbf{Scaled Dot-Product Attention}. Unlike standard attention, Self-Attention relates different positions of a single sequence to compute a representation of the same sequence.
+
+For an input embedding $X$, we compute three vectors: \textbf{Query ($Q$)}, \textbf{Key ($K$)}, and \textbf{Value ($V$)} using learned weight matrices $W^Q, W^K, W^V$:
+\begin{equation}
+    Q = XW^Q, \quad K = XW^K, \quad V = XW^V
+\end{equation}
+
+The attention scores are calculated as follows:
+\begin{equation}
+    \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+where $d_k$ is the dimension of the keys.
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item \textbf{Parallelization:} Unlike RNNs, all tokens are processed simultaneously.
+    \item \textbf{Global Context:} It captures both local and global dependencies regardless of their distance in the sequence.
+    \item \textbf{Training Speed:} When combined with masking, the training process becomes highly efficient.
+\end{itemize}
+
+\subsubsection{Multi-Head Attention (MHA)}
+Instead of performing a single attention function, Multi-Head Attention allows the model to jointly attend to information from different representation subspaces at different positions.
+\begin{equation}
+    \text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \dots, \text{head}_h)W^O
+\end{equation}
+where each $\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$.
+
+\textbf{Purpose:}
+\begin{itemize}
+    \item Enables the model to learn multiple types of relationships (e.g., syntactic vs. semantic) within a single block.
+    \item Further enhances parallel computation capabilities.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/mha.png}
+    \caption{MultiHead Attention}
+    \label{fig:mha}
+\end{figure}
+
+\subsubsection{Feed-Forward Network and Add-Norm}
+Each layer in our encoder and decoder contains a fully connected \textbf{Position-wise Feed-Forward Network (FFN)}:
+\begin{equation}
+    \text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2
+\end{equation}
+This consists of two linear transformations with a ReLU activation in between, projecting the data to a higher dimension and then back to stabilize representations.
+
+To ensure deep networks can be trained effectively, each sub-layer (Attention and FFN) is wrapped in an \textbf{Add-Norm} layer:
+\begin{itemize}
+    \item \textbf{Residual Connection (Add):} Helps avoid the vanishing gradient problem and retains early information.
+    \item \textbf{Layer Normalization (Norm):} Normalizes the inputs to stabilize the learning process.
+\end{itemize}
+
+\subsubsection{Embeddings and Positional Encoding}
+Since the Transformer contains no recurrence or convolution, it has no inherent sense of the relative or absolute position of tokens. 
+\begin{itemize}
+    \item \textbf{Token Embedding:} Converts text into fixed-size vectors.
+    \item \textbf{Positional Encoding:} Unique vectors are added to the input embeddings to provide information about the order of tokens.
+    \item \textbf{Shift Right:} In the decoder, the output is shifted to the right to ensure that the prediction for a token only depends on the previously generated tokens (preventing "looking into the future").
+\end{itemize}
+
+\subsubsection{Operational Flow}
+\textbf{Training Phase:}
+\begin{enumerate}
+    \item Source and target sequences are embedded and augmented with positional encodings.
+    \item The Encoder processes the source sequence through multiple layers. The final output serves as the \textit{Key} and \textit{Value} for the Decoder's \textit{Cross-Attention} mechanism.
+    \item The Decoder receives the masked target input, allowing it to compute all positions in parallel via \textit{Masked Multi-Head Attention}.
+    \item The final output passes through a Linear layer and a Softmax function to predict tokens, calculating loss for backpropagation.
+\end{enumerate}
+
+\textbf{Inference Phase:}
+The process is similar but \textbf{autoregressive}. The target sequence starts empty (or with a start token). Each predicted token is appended to the input of the decoder for the next step until an end-of-sequence token is generated.
+
+\subsubsection{Comparative Analysis}
+The following table summarizes the differences between traditional recurrent models and the Transformer:
+
+\begin{table}[h]
+\centering
+\caption{Comparison: LSTM/GRU vs. Transformer}
+\begin{tabular}{@{}lll@{}}
+\textbf{Feature} & \textbf{LSTM / GRU} & \textbf{Transformer} \\
+\textbf{Training} & Slow (Sequential computation) & Fast (Highly parallelizable) \\
+\textbf{Inference} & Similar speed to Transformer & Efficient \\
+\textbf{Long-range Dependency} & Poor (Memory fades over time) & Excellent (Global attention) \\
+\textbf{Short/Medium Sequences} & Performs very well & Performs exceptionally \\
+\textbf{Very Long Sequences} & Significant performance drop & Superior (but requires memory optimization) \\
+\end{tabular}
+\end{table}
+
 \subsection{Large language model}
 
 
