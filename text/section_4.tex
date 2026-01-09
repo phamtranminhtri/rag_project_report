@@ -66,6 +66,148 @@ Modern RAG systems often employ hybrid retrieval that combines sparse retrievers
 When fine-tuning is impractical, adapter-based methods provide lightweight alternatives. These include prompt retrievers, bridging modules that transform retrieved content into LLM-friendly formats, and plug-in knowledge generators that replace or augment traditional retrievers in white-box settings.
 
 \subsection{Generation}
+
+Generation is the final stage in a Retrieval-Augmented Generation (RAG) pipeline, where the Large Language Model (LLM) produces the final response based on the user query and the augmented context retrieved from external knowledge sources. This stage directly determines the quality, coherence, and usefulness of the system’s output.
+
+\subsubsection{Overview of the Generation Stage}
+
+In the basic RAG setting, also referred to as \textit{Naive RAG}, the generation stage receives the user query together with the retrieved documents as input. These elements are combined into a single prompt, which is then passed to a frozen LLM to generate the final answer.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/generation_naive_rag.png}
+    \caption{Generation stage in Naive RAG, where retrieved context is directly passed to a frozen LLM via a prompt}
+    \label{fig:generation_naive}
+\end{figure}
+
+The generated response is expected to be fluent, context-grounded, and aligned with the retrieved evidence. However, this approach may suffer from noisy or redundant context, which can degrade answer quality.
+
+\subsubsection{Context Curation for Improved Generation}
+
+To address the limitations of Naive RAG, advanced RAG systems introduce a \textit{context curation} step before generation. The goal of context curation is to improve relevance and reduce noise in the retrieved context supplied to the LLM.
+
+Key components of context curation include:
+\begin{itemize}
+    \item \textbf{Reranking}: reorders retrieved documents to prioritize the most relevant ones.
+    \item \textbf{Context Selection or Compression}: filters, summarizes, or shortens retrieved content to avoid overly long prompts.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/generation_context_curation.png}
+    \caption{Advanced RAG with post-retrieval context curation before generation}
+    \label{fig:generation_context}
+\end{figure}
+
+By providing a more concise and focused augmented prompt, context curation enables the LLM to generate higher-quality and more accurate responses.
+
+\subsubsection{LLM Fine-tuning for Generation}
+
+Beyond improving the quality of the input context, generation performance can be further enhanced by fine-tuning the LLM itself. The objective of LLM fine-tuning is to adapt the model to domain-specific knowledge and desired response styles.
+
+The key benefits of LLM fine-tuning include:
+\begin{itemize}
+    \item \textbf{Domain Adaptation}: improves understanding and reasoning in specialized domains.
+    \item \textbf{Output Alignment}: aligns tone, structure, and formatting with predefined guidelines.
+    \item \textbf{Reduced Hallucination}: encourages stronger reliance on retrieved evidence.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/generation_llm_finetuning.png}
+    \caption{Generation stage using a fine-tuned LLM in an Advanced RAG pipeline}
+    \label{fig:generation_finetune}
+\end{figure}
+
+As a result, fine-tuned generation produces responses that are more accurate, coherent, and context-grounded, making it suitable for domain-specific and high-stakes applications.
+
 \subsection{Augmentation}
+
+Augmentation is a key process in Retrieval-Augmented Generation (RAG) systems that enhances answer quality by iteratively refining retrieval and generation. Instead of performing retrieval only once, the system can retrieve additional information, reformulate queries, or adjust context dynamically during the answering process.
+
+\subsubsection{Overview of the Augmentation Process}
+
+In the augmentation process, retrieval and generation are tightly coupled in an iterative loop. After each generation step, the system evaluates whether the current information is sufficient or if additional retrieval is required before producing the final response.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/augmentation_overview.png}
+    \caption{Overview of the iterative augmentation process in RAG}
+    \label{fig:augmentation_overview}
+\end{figure}
+
+The main purposes of augmentation are:
+\begin{itemize}
+    \item Handling complex or multi-step reasoning questions.
+    \item Producing more accurate and context-grounded answers.
+\end{itemize}
+
+\subsubsection{Iterative Retrieval}
+
+Iterative retrieval repeatedly alternates between retrieving new context and generating partial answers. Each generation step provides new signals that guide the next retrieval, gradually enriching the available context.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/augmentation_iterative.png}
+    \caption{Iterative retrieval with repeated retrieval--generation cycles}
+    \label{fig:augmentation_iterative}
+\end{figure}
+
+The key ideas behind iterative retrieval include:
+\begin{itemize}
+    \item Retrieval is performed again based on what has been generated so far.
+    \item Context is progressively enriched to support step-by-step reasoning.
+\end{itemize}
+
+\textbf{Pros and Cons:}
+\begin{itemize}
+    \item \textbf{Advantages}: more comprehensive and targeted information.
+    \item \textbf{Disadvantages}: risk of semantic drift or accumulation of irrelevant context.
+\end{itemize}
+
+\subsubsection{Recursive Retrieval}
+
+Recursive retrieval refines the query step-by-step using feedback from previous retrieval results. Each iteration clarifies what information is still missing, leading to progressively more relevant context.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/augmentation_recursive.png}
+    \caption{Recursive retrieval with query transformation and decomposition}
+    \label{fig:augmentation_recursive}
+\end{figure}
+
+Key characteristics of recursive retrieval include:
+\begin{itemize}
+    \item Construction of intermediate reasoning structures such as chain-of-thought or clarification trees.
+    \item Continuous reformulation of the query to target more specific information.
+\end{itemize}
+
+\textbf{Pros and Cons:}
+\begin{itemize}
+    \item \textbf{Advantages}: improved accuracy and relevance over multiple iterations.
+    \item \textbf{Disadvantages}: increased latency due to multiple refinement steps.
+\end{itemize}
+
+\subsubsection{Adaptive Retrieval}
+
+Adaptive retrieval allows the LLM to dynamically decide when and what to retrieve during generation. Instead of enforcing retrieval at fixed stages, the model monitors its own confidence and triggers retrieval only when additional context is required.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/augmentation_adaptive.png}
+    \caption{Adaptive retrieval where the LLM actively controls retrieval decisions}
+    \label{fig:augmentation_adaptive}
+\end{figure}
+
+The key ideas of adaptive retrieval are:
+\begin{itemize}
+    \item Retrieval is performed on demand rather than at predefined stages.
+    \item The LLM behaves like an agent, evaluating intermediate outputs and deciding whether to retrieve more context or proceed to the final answer.
+\end{itemize}
+
+\subsubsection{Summary}
+
+In summary, augmentation enhances the RAG pipeline by enabling iterative and adaptive interaction between retrieval and generation. Iterative, recursive, and adaptive retrieval strategies provide increasing levels of flexibility and reasoning capability, allowing RAG systems to better handle complex queries and produce more accurate, context-aware responses.
+
 \subsection{Task \& evaluation}
 \subsection{Discussion}

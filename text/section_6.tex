@@ -34,6 +34,38 @@ These tools are wrapped and exposed to the agent, allowing it to dynamically dec
 
 The agent is initialized with a system prompt that defines its role and behavior. The conversational backbone uses the \texttt{gemini-2.5-flash} chat model for response generation. To maintain contextual coherence, short-term memory is incorporated, enabling the agent to remember and reference previous turns within a single conversation thread.
 
+\subsection{Text-to-Speech}
 
-\subsection{Text-to-speech}
+Text-to-Speech (TTS) is a technology that converts written text into synthesized speech, enabling AI systems to produce audible responses for users. In conversational AI and Retrieval-Augmented Generation (RAG) systems, TTS plays an important role in enhancing user interaction by delivering information in a natural and accessible audio format.
+
+\subsubsection{Text-to-Speech Pipeline}
+
+A typical Text-to-Speech system follows a multi-stage processing pipeline that transforms raw text into an audio signal. The main stages of this pipeline are illustrated in Figure~\ref{fig:tts_pipeline}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/tts_pipeline.png}
+    \caption{General Text-to-Speech pipeline from text input to synthesized speech output}
+    \label{fig:tts_pipeline}
+\end{figure}
+
+The process begins with \textbf{text pre-processing}, where the input text is normalized by handling numbers, abbreviations, and formatting. Next, \textbf{linguistic analysis} examines grammatical structure and syntactic features. The \textbf{grapheme-to-phoneme conversion} stage maps characters to phonemes to determine correct pronunciation. Based on this phonetic representation, \textbf{pattern determination} defines prosodic features such as rhythm, pitch, and stress. Finally, \textbf{speech signal generation} synthesizes the waveform that produces the audible speech output.
+
+\subsubsection{gTTS: Google Text-to-Speech}
+
+gTTS (Google Text-to-Speech) is a lightweight Python library that provides an easy-to-use interface for converting text into speech. It leverages Google Translate’s text-to-speech service to generate spoken audio from textual input and outputs the result as an MP3 file.
+
+The simplicity of gTTS makes it suitable for rapid prototyping and integration into AI applications where basic speech output is required. Figure~\ref{fig:gtts_example} shows a minimal example of using gTTS to synthesize Vietnamese speech from text.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{image/gtts_example.png}
+    \caption{Example of using gTTS in Python to generate an MP3 file from text}
+    \label{fig:gtts_example}
+\end{figure}
+
+In this example, the input text is passed to the gTTS library along with the target language code. The generated speech is then saved as an audio file, which can be played back by the system. While gTTS is easy to use and freely accessible, it provides limited control over voice characteristics and requires an internet connection.
+
+Overall, Text-to-Speech systems such as gTTS complement language models by enabling multimodal interaction, allowing AI-driven applications to communicate information not only through text but also through natural-sounding speech.
+
 \subsection{Speech-to-text}

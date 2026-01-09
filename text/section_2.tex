@@ -1,6 +1,121 @@
 \section{Prerequisite: ANN, Transformer, LLM}
 
-\subsection{Artificial neural network}
+\subsection{Artificial Neural Network}
+
+Artificial Neural Networks (ANNs) are computational models inspired by the biological neural system. An ANN consists of multiple artificial neurons interconnected through weighted connections, enabling the model to learn complex mappings between input data and output predictions. Neural networks are widely used in classification, regression, and pattern recognition tasks due to their strong representation capability.
+
+\subsubsection{Overall Architecture of Neural Networks}
+
+A typical feedforward neural network is composed of three main components: an input layer, one or more hidden layers, and an output layer. Information flows from the input layer through hidden layers to produce the final output.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{image/network_structure.png}
+    \caption{Basic architecture of a feedforward neural network}
+    \label{fig:nn_structure}
+\end{figure}
+
+Each neuron in one layer is usually connected to all neurons in the next layer through weighted edges, allowing the network to model complex relationships.
+
+\subsubsection{Mathematical Model of an Artificial Neuron}
+
+An artificial neuron performs a weighted summation of its inputs followed by a nonlinear transformation. Given $n$ input features $x_i$, the neuron computes an intermediate value $z$ as:
+
+\begin{equation}
+z = \sum_{i=1}^{n} w_i x_i + b
+\end{equation}
+
+where $w_i$ denotes the weight associated with input $x_i$, and $b$ is the bias term. The output of the neuron is obtained by applying an activation function $f(\cdot)$:
+
+\begin{equation}
+y = f(z)
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{image/neuron_model.png}
+    \caption{Mathematical structure of an artificial neuron}
+    \label{fig:neuron_model}
+\end{figure}
+
+\subsubsection{Activation Functions}
+
+Activation functions introduce non-linearity into the neural network. Without them, the network would behave as a linear model and fail to capture complex patterns in data. Common activation functions include:
+
+\begin{itemize}
+    \item \textbf{Sigmoid}: maps input values into the range $(0,1)$, often used in binary classification.
+    \item \textbf{Tanh}: outputs values in the range $(-1,1)$, providing zero-centered activations.
+    \item \textbf{ReLU (Rectified Linear Unit)}: defined as $f(z) = \max(0, z)$, widely used due to its simplicity and effectiveness.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image/activation_functions.png}
+    \caption{Common activation functions: Sigmoid, Tanh, and ReLU}
+    \label{fig:activation}
+\end{figure}
+
+\subsubsection{Single-layer and Multi-layer Perceptrons}
+
+A \textbf{single-layer perceptron} contains no hidden layers and can only solve linearly separable problems. In contrast, a \textbf{multi-layer perceptron (MLP)} consists of one or more hidden layers, enabling the network to learn complex nonlinear relationships.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image/perceptron_comparison.png}
+    \caption{Comparison between single-layer and multi-layer perceptrons}
+    \label{fig:perceptron}
+\end{figure}
+
+\subsubsection{Forward Propagation}
+
+Forward propagation is the process in which input data is passed through the network layer by layer to compute the output prediction. At each layer, weighted sums and activation functions are applied to transform the data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image/forward_propagation.png}
+    \caption{Forward propagation through hidden layers}
+    \label{fig:forward}
+\end{figure}
+
+\subsubsection{Loss Function}
+
+The loss function measures the discrepancy between the predicted output $\hat{y}$ and the true target value $y$. It acts as a guidance signal for the learning process, where a smaller loss indicates better model performance. Common loss functions include:
+
+\begin{itemize}
+    \item Mean Squared Error (MSE) for regression tasks:
+    \begin{equation}
+        L = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+    \end{equation}
+    \item Cross-Entropy Loss for classification tasks:
+    \begin{equation}
+        L = - \sum_{i=1}^{n} y_i \log(\hat{y}_i)
+    \end{equation}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image/loss_function.png}
+    \caption{Illustration of prediction error and loss minimization}
+    \label{fig:loss}
+\end{figure}
+
+\subsubsection{Backpropagation and Weight Update}
+
+Backpropagation is an algorithm used to compute the gradient of the loss function with respect to each weight in the network. Based on these gradients, weights are updated iteratively using optimization methods such as gradient descent.
+
+The training process of a neural network consists of three repeated steps:
+\begin{enumerate}
+    \item Forward propagation
+    \item Backpropagation
+    \item Weight update
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image/backpropagation.png}
+    \caption{Training process: forward propagation, backpropagation, and weight update}
+    \label{fig:backprop}
+\end{figure}
 
 \subsection{Transformer architecture}
 

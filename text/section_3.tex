@@ -1,6 +1,93 @@
 \section{Agent, URAG, LangChain}
 
-\subsection{AI agent}
+\subsection{AI Agent}
+
+An AI agent is a system that leverages an artificial intelligence model to interact with its environment in order to achieve a user-defined objective. Unlike traditional AI systems that produce static outputs, an AI agent integrates reasoning, planning, and action execution to complete tasks in a dynamic and autonomous manner.
+
+\subsubsection{Introduction to AI Agents}
+
+An AI agent operates by receiving a user request, reasoning about the task, selecting appropriate tools, and executing actions to fulfill the objective. This process allows agents to solve multi-step problems that require interaction with external systems and continuous adaptation based on feedback.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image/agent_workflow.png}
+    \caption{High-level AI agent workflow: user request, reasoning, and tool-based action}
+    \label{fig:agent_workflow}
+\end{figure}
+
+\subsubsection{Core Components of an AI Agent}
+
+AI agents consist of two main components:
+
+\begin{itemize}
+    \item \textbf{The Brain (AI Model)}:  
+    This component is typically a Large Language Model (LLM) that performs reasoning, understands context, plans future steps, and decides which actions or tools should be used.
+    
+    \item \textbf{The Body (Capabilities and Tools)}:  
+    This component enables the agent to act within its environment. It includes external tools and APIs such as search engines, code execution environments, and databases, as well as memory and observation mechanisms.
+\end{itemize}
+
+\subsubsection{Levels of Agent Agency}
+
+AI agents can be categorized according to their level of autonomy, commonly referred to as their \textit{agency level}. As the agency level increases, the agent gains greater control over program execution and decision-making.
+
+\subsubsection{Thought--Action--Observation Cycle}
+
+The behavior of an AI agent follows a continuous loop known as the \textit{Thought--Action--Observation} cycle. In this cycle, the agent first reasons about the problem, then performs an action, and finally observes the result of that action. The observation is used to update the agent’s internal state and guide subsequent reasoning steps.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image/tao_cycle.png}
+    \caption{The Thought--Action--Observation (TAO) cycle in an AI agent}
+    \label{fig:tao_cycle}
+\end{figure}
+
+This iterative cycle enables agents to adapt their behavior dynamically based on environmental feedback.
+
+\subsubsection{Practical Illustration of the TAO Cycle}
+
+A common example of the Thought--Action--Observation cycle is a task that requires external information, such as retrieving real-time weather data. The agent reasons about the user’s request, calls an appropriate external API, observes the returned data, and then produces a response.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image/tao_weather_step1.png}
+    \caption{Reasoning and action steps using an external weather API}
+    \label{fig:tao_weather_1}
+\end{figure}
+
+\subsubsection{Observation and Response Generation}
+
+After executing an action, the agent observes the outcome and integrates the feedback into its internal context. Based on this updated information, the agent performs additional reasoning to generate the final response for the user.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image/tao_weather_step2.png}
+    \caption{Observation feedback and final response generation}
+    \label{fig:tao_weather_2}
+\end{figure}
+
+\subsubsection{Internal Reasoning: Chain-of-Thought and ReAct}
+
+Reasoning is a critical capability of AI agents. Two widely used prompting approaches are:
+
+\begin{itemize}
+    \item \textbf{Chain-of-Thought (CoT)}:  
+    A technique that encourages the model to reason step-by-step before generating a final answer.
+    
+    \item \textbf{ReAct (Reasoning and Acting)}:  
+    A technique that interleaves reasoning steps with actions, allowing the agent to think, act using tools, observe results, and continue reasoning until the task is completed.
+\end{itemize}
+
+\subsubsection{Actions: Enabling Interaction with the Environment}
+
+Actions allow an AI agent to engage with its environment and accomplish tasks. Common categories of actions include information gathering, tool usage, environment interaction, and communication.
+
+\subsubsection{Observation and Adaptation}
+
+After executing an action, the agent observes the outcome and integrates the feedback into its internal context. This enables the agent to update its memory, refine its strategy, and improve performance in future interactions.
+
+
+
 
 \subsection{Unified Hybrid RAG}
 

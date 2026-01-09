@@ -1,6 +1,52 @@
 \section{Reranking, RAG-Reasoning, RAG-RL}
 
-\subsection{Reranking in RAG}
+\subsection{Reranking}
+
+\subsubsection{Limitations of Vector-Based Retrieval}
+
+In large-scale Retrieval-Augmented Generation (RAG) systems, retrieval is typically performed using dense vector embeddings and approximate nearest neighbor (ANN) search. While this approach is highly efficient and scalable, it introduces fundamental limitations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{image/ann_retrieval_limitation.png}
+    \caption{Approximate nearest neighbor search may return vectors that are close in embedding space but not truly semantically relevant}
+    \label{fig:ann_limitation}
+\end{figure}
+
+Dense retrieval commonly relies on a bi-encoder architecture, where queries and documents are encoded independently into vector representations. ANN search then finds the nearest vectors in the embedding space. However, vector similarity does not necessarily correspond to true semantic relevance. As a result, the retrieved top-$k$ documents may lack sufficient reasoning, logical structure, or supporting evidence required by the LLM. Noisy or weakly relevant context can increase confusion and hallucination during generation.
+
+\subsubsection{Reranking as a Post-Retrieval Refinement Step}
+
+To mitigate the limitations of vector-based retrieval, reranking is introduced as a post-retrieval refinement step in the RAG pipeline. Instead of directly passing the retrieved documents to the generator, reranking evaluates and reorders them based on more accurate relevance estimation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/reranking_pipeline.png}
+    \caption{Reranking as an intermediate step between retrieval and generation in Advanced RAG}
+    \label{fig:reranking_pipeline}
+\end{figure}
+
+In this stage, each retrieved document is assessed together with the query, and the documents are reordered to prioritize those that are most relevant. By selecting a smaller set of high-quality passages, reranking reduces noise in the prompt and improves factual accuracy, coherence, and reliability of the final LLM-generated response.
+
+\subsubsection{Bi-Encoder versus Cross-Encoder for Reranking}
+
+A key architectural distinction in RAG systems lies between bi-encoders used for retrieval and cross-encoders used for reranking.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{image/bi_vs_cross_encoder.png}
+    \caption{Comparison between bi-encoder retrieval and cross-encoder reranking architectures}
+    \label{fig:bi_vs_cross}
+\end{figure}
+
+Bi-encoders encode the query and documents separately and compute relevance using vector similarity. This design enables fast retrieval over large document collections but captures only coarse semantic similarity. In contrast, cross-encoders jointly encode the query and document within a single model, allowing full cross-attention between them. This results in significantly more accurate relevance estimation.
+
+Due to their higher computational cost, cross-encoders are typically applied only to the top-$k$ candidates returned by the bi-encoder. This two-stage design effectively balances scalability and accuracy in modern RAG systems.
+
+\subsubsection{Summary}
+
+In summary, reranking plays a critical role in bridging the gap between efficient retrieval and accurate generation. By refining retrieved results using more precise relevance modeling, reranking improves context quality, reduces hallucination, and significantly enhances the overall performance of Retrieval-Augmented Generation systems.
+
 \subsection{Towards Agentic RAG with Deep Reasoning: A Survey of RAG Reasoning Systems in LLMs}
 
 Link to paper: \url{https://arxiv.org/abs/2507.09477} \cite{li2025towards}
@@ -13,9 +59,6 @@ The survey categorizes existing approaches into three major paradigms. The first
 The second paradigm is {RAG-Enhanced Reasoning}, which treats retrieval as a tool to directly support the reasoning process of LLMs. In this setting, models retrieve external knowledge such as structured knowledge bases, web content, tools, or prior experiences to assist in complex reasoning tasks including mathematical problem solving, fact verification, and planning. In-context retrieval of examples and historical interactions further enables LLMs to adapt reasoning strategies dynamically based on retrieved demonstrations or memories.
 
 The third paradigm, {Synergized RAG-Reasoning}, represents the most advanced integration, where retrieval and reasoning are tightly interwoven within an agentic workflow. These systems interleave reasoning steps with retrieval actions using chain-based, tree-based, or graph-based reasoning workflows. Moreover, agent orchestration techniques, including single-agent and multi-agent systems, allow LLMs to autonomously plan, retrieve, reason, and verify information. Such agentic RAG systems exhibit improved robustness, interpretability, and adaptability in complex tasks.
-
-
-
 
 % \begin{table}[]
 % \centering
