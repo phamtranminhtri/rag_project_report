@@ -86,10 +86,74 @@ Actions allow an AI agent to engage with its environment and accomplish tasks. C
 
 After executing an action, the agent observes the outcome and integrates the feedback into its internal context. This enables the agent to update its memory, refine its strategy, and improve performance in future interactions.
 
+\subsection{Unified Hybrid RAG (URAG)}
 
+\subsubsection{Challenges in Conventional RAG}
+Despite the success of Retrieval-Augmented Generation (RAG) in grounding LLM responses, several critical challenges remain:
+\begin{itemize}
+    \item \textbf{Dangerous Hallucinations:} LLMs may still generate plausible-looking but factually incorrect information, which is particularly risky in specialized domains.
+    \item \textbf{Accuracy Limitations in Lightweight LLMs:} Smaller, cost-effective models often struggle to maintain high accuracy compared to their larger counterparts.
+    \item \textbf{Noise in Retrieval Results:} Irrelevant or noisy documents retrieved from the vector database can distract the model, leading to suboptimal generation.
+    \item \textbf{Decoupling of Retrieval and Generation:} A significant disconnect often exists between the retrieval phase and the final generation phase, preventing seamless information flow.
+\end{itemize}
 
+\subsubsection{Evolution of Enhancement Strategies}
+Various strategies have been proposed to mitigate these issues, though they often come with trade-offs:
+\begin{itemize}
+    \item \textbf{Retriever Enhancements:} Incorporating structured data, such as Knowledge Graphs, to improve context retrieval.
+    \item \textbf{Reflective/Corrective RAG:} Implementing self-correction loops to detect and fix hallucinations by enriching inputs.
+    \item \textbf{Speculative RAG:} Utilizing parallel processing to generate multiple draft responses simultaneously.
+\end{itemize}
+\textbf{Drawbacks:} While effective, these methods significantly increase \textbf{system complexity}, lead to \textbf{longer latency} (processing times), and require \textbf{higher computational resources}.
 
-\subsection{Unified Hybrid RAG}
+\subsubsection{The URAG Framework: Tiered Architecture}
+The core concept of URAG is inspired by \textbf{Human Advisor Systems}. Just as a human advisor first consults a Frequently Asked Questions (FAQ) list before searching through thick manuals, URAG operates on a tiered retrieval strategy:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image/urag_idea.png}
+    \caption{URAG idea}
+    \label{fig:urag_idea}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Tier 1: Enriched FAQ Database:} This tier utilizes a database that integrates data from various text corpora with existing FAQs. Automated via the \textbf{URAG-F} mechanism, it ensures that common and critical queries receive direct, high-precision responses.
+    \item \textbf{Tier 2: Augmented Document Retrieval:} If Tier 1 fails to find a match, the system searches a document corpus enhanced by \textbf{URAG-D}. This mimics traditional RAG but uses optimized prompt templates to guide the LLM.
+    \item \textbf{Fallback Mechanism:} In cases where neither tier retrieves sufficient information, the system generates a response directly from the LLM's internal knowledge, accompanied by a \textbf{disclaimer} to manage user expectations regarding potential inaccuracies.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image/urag_workflow.png}
+    \caption{URAG workflow}
+    \label{fig:urag_workflow}
+\end{figure}
+
+\subsubsection{URAG Preparation Workflow}
+The URAG architecture unifies two preparatory mechanisms to optimize performance. A key component used throughout is \textbf{Chain-of-Thought (CoT) Prompting}, which enhances the reasoning capabilities of the LLM to ensure reliable output.
+
+\paragraph{URAG-D: Document Database Augmentation}
+Unlike "Naive RAG" which uses raw document chunks, URAG-D improves retrieval through:
+\begin{itemize}
+    \item \textbf{Strategic Segmentation:} Dividing documents into coherent, logical chunks.
+    \item \textbf{Contextual Rewriting:} Each chunk is rewritten for consistency and contextual relevance. The process extracts the general context of the original document to maintain logical coherence across chunks.
+    \item \textbf{Summarization:} A brief summary sentence is prepended to each rewritten chunk to facilitate better matching during retrieval.
+\end{itemize}
+
+\paragraph{URAG-F: FAQ Database Enrichment}
+The URAG-F mechanism leverages the augmented corpus from URAG-D and the initial FAQ set to:
+\begin{itemize}
+    \item \textbf{Q-A Pair Generation:} Extract and generate new, high-quality Question-Answer pairs from the processed documents.
+    \item \textbf{Linguistic Diversity:} Paraphrase these pairs into multiple variations to ensure the system can handle diverse user phrasing and linguistic styles.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image/urag_prepare.png}
+    \caption{Preparation of URAG}
+    \label{fig:urag_prepare}
+\end{figure}
+
 
 \subsection{Introduction to LangChain}
 
