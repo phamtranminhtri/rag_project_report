@@ -91,3 +91,92 @@ The survey highlights a clear evolution from static retrieval pipelines toward d
 \subsection{RAG-RL: Advancing Retrieval Augmented Generation via RL and Curriculum Learning}
 
 Link to paper: \url{https://arxiv.org/abs/2503.12759} \cite{huang2025ragrl}
+
+\subsubsection{The Problem of Imperfect Retrieval}
+Modern RAG systems are highly dependent on the precision of the retriever. However, in practical scenarios, retrievers often return a mix of relevant documents and irrelevant "distractors" (noise). This leads to two major issues:
+\begin{itemize}
+    \item \textbf{Generator Hallucination:} The LLM (Generator) may struggle to distinguish between gold context and noise, leading to incorrect or fabricated outputs.
+    \item \textbf{Bottleneck of Retrieval Optimization:} Achieving 100\% retriever precision is computationally prohibitive and technically challenging.
+\end{itemize}
+
+\textbf{Proposed Solution:} Instead of solely focusing on fixing the retriever, the \textbf{RAG-RL} approach aims to train a \textbf{Robust Generator}. This empowers the LLM to autonomously identify relevant contexts and ignore noise by combining \textbf{Reinforcement Learning (RL)} for reasoning and \textbf{Curriculum Learning (CL)} for noise robustness.
+
+\subsubsection{Foundational Concepts: RL and CL}
+
+\paragraph{Reinforcement Learning (RL)}
+RL is a paradigm where an \textbf{Agent} interacts with an \textbf{Environment} to maximize a cumulative \textbf{Reward}.
+\begin{itemize}
+    \item \textbf{Agent:} The decision-maker (in this case, the LLM).
+    \item \textbf{State ($s$):} The current situation (Query + Retrieved Documents).
+    \item \textbf{Action ($a$):} The generated response and citations.
+    \item \textbf{Reward ($r$):} Feedback indicating the quality of the action.
+\end{itemize}
+The RL feedback loop enables the agent to update its policy $\pi$ by balancing \textit{exploration} (trying new generation patterns) and \textit{exploitation} (using known high-reward patterns).
+
+\paragraph{Curriculum Learning (CL)}
+Inspired by human education, CL involves training a model by starting with simple concepts and gradually increasing difficulty.
+\begin{itemize}
+    \item \textbf{Synthetic Difficulty:} Samples are scored based on complexity (e.g., number of distractors).
+    \item \textbf{Scheduler:} Manages the transition from \textit{Easy Samples} (low noise) to \textit{Hard Samples} (high noise) to prevent the model from being overwhelmed early in training.
+\end{itemize}
+
+\subsubsection{The Synergy of RL and CL}
+Combining these two paradigms addresses the following:
+\begin{itemize}
+    \item \textbf{Solving the "Cold Start" Problem:} In noisy environments, an untrained model fails to generate correct citations, leading to zero rewards and stagnant learning. CL provides "easy" (clean) samples first to establish a positive reward baseline.
+    \item \textbf{Two-Phase Robustness:} The model learns \textbf{how} to cite (formatting/syntax) in Phase 1, and \textbf{what} to cite (relevance/filtering) in Phase 2.
+\end{itemize}
+
+\subsubsection{Methodology}
+
+\paragraph{Agent and Environment}
+In the RAG-RL framework, the \textbf{Generator (LLM)} acts as the agent. The \textbf{Environment} consists of the retrieved documents (Gold context + Distractors). The \textbf{Action} is the final generated answer bundled with specific citations.
+
+\paragraph{Optimization via GRPO}
+The framework utilizes \textbf{Group Relative Policy Optimization (GRPO)}. For each query, the LLM generates a group of $G$ candidate answers. The model prioritizes answers with higher relative rewards within the group, effectively refining its policy without requiring a separate value function.
+
+\paragraph{Reward Design}
+To quantify the quality of the generation, the total reward $R_{total}$ is defined as a multi-objective function:
+\begin{equation}
+    R_{total} = R_{answer} + R_{citation} + R_{format}
+\end{equation}
+
+Where the individual components are defined as:
+\begin{itemize}
+    \item \textbf{Answer Reward:} Uses an indicator function $\mathbb{1}$ to check if the generated answer $o_{ans}$ matches the ground truth $G_{ans}$.
+    \begin{equation}
+        R_{answer} = \gamma_{ans} \cdot \mathbb{1}(o_{ans} = G_{ans})
+    \end{equation}
+    \item \textbf{Citation Reward:} Measures the accuracy of the sources cited.
+    \begin{equation}
+        R_{citation} = \gamma_{cor} \cdot \text{Recall}(o_{cit}, G_{cit}) - \gamma_{inc} \cdot c_{inc}
+    \end{equation}
+    where $c_{inc}$ is the count of incorrect citations.
+    \item \textbf{Formatting Reward:}
+    \begin{equation}
+        R_{format} = 
+        \begin{cases} 
+        \gamma_{fmt} & \text{if format is correct} \\
+        -p & \text{otherwise}
+        \end{cases}
+    \end{equation}
+\end{itemize}
+Constants are set as: $\gamma_{ans} = 5, \gamma_{cor} = 5, \gamma_{inc} = 2$.
+
+\subsubsection{Training Schedules and Results}
+The study evaluates three curriculum strategies to manage the number of distractors ($K$):
+\begin{enumerate}
+    \item \textbf{Max Curriculum (Baseline):} Static training on the hardest samples ($K$ distractors) throughout.
+    \item \textbf{Linear Curriculum:} Gradually increases the number of distractors from $1$ to $K$ linearly over training steps.
+    \item \textbf{Min-Max Curriculum:} A step-function approach where the first half of training uses only $1$ distractor, and the second half jumps to $K$ distractors.
+\end{enumerate}
+
+\textbf{Experimental Results:}
+Using \textbf{Qwen2.5-7B-Instruct} as the base model and testing across \textbf{HotpotQA, MuSiQue, and 2WikiMultiHopQA} datasets, the results indicate that \textbf{Min-Max} and \textbf{Linear Curriculum} schedules consistently and significantly outperform the Max Curriculum baseline, demonstrating the importance of gradual noise introduction in training robust RAG agents.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image/rag_rl.png}
+    \caption{Model performance under the distractor and ideal retrieval evaluation settings across different curriculum construction settings}
+    \label{fig:rag_rl}
+\end{figure}

@@ -209,5 +209,64 @@ The key ideas of adaptive retrieval are:
 
 In summary, augmentation enhances the RAG pipeline by enabling iterative and adaptive interaction between retrieval and generation. Iterative, recursive, and adaptive retrieval strategies provide increasing levels of flexibility and reasoning capability, allowing RAG systems to better handle complex queries and produce more accurate, context-aware responses.
 
-\subsection{Task \& evaluation}
+\subsection{Tasks and Evaluation Framework}
+
+\subsubsection{Downstream Tasks and Benchmarks}
+The primary objective of RAG systems is to support various Natural Language Processing (NLP) tasks by providing external context. While Question Answering (QA) remains the most prominent application, the scope of RAG is rapidly expanding.
+
+\begin{itemize}
+    \item \textbf{Question Answering (QA):} This is the core application, encompassing several complexities:
+    \begin{itemize}
+        \item \textit{Single-hop QA:} Requires retrieving information from a single document (e.g., \textbf{Natural Questions (NQ), TriviaQA, SQuAD}).
+        \item \textit{Multi-hop QA:} Requires synthesizing information across multiple documents to answer complex queries (e.g., \textbf{HotpotQA, 2WikiMultiHopQA, MuSiQue}).
+        \item \textit{Domain-specific QA:} Tailored for specialized fields like medicine or research (e.g., \textbf{Qasper, COVID-QA, MMCU Medical}).
+    \end{itemize}
+    \item \textbf{Expanded Tasks:} Beyond QA, RAG is utilized in \textbf{Information Extraction (IE)}, \textbf{Dialogue Generation}, and \textbf{Code Search}, where external documentation is vital for accuracy.
+\end{itemize}
+
+\subsubsection{Evolution of Evaluation Targets}
+Traditional evaluation relied on lexical overlap metrics, but modern RAG research shifts toward component-level analysis.
+
+\begin{enumerate}
+    \item \textbf{Traditional Metrics:} Metrics such as \textbf{EM (Exact Match)}, \textbf{F1 score}, and \textbf{ROUGE} were standard. However, they fail to evaluate the internal reasoning of the model or the quality of the retrieved context.
+    \item \textbf{Modern RAG Metrics:} Evaluation is now bifurcated into two primary targets:
+    \begin{itemize}
+        \item \textbf{Retrieval Quality:} Measured by \textbf{Hit Rate}, \textbf{Mean Reciprocal Rank (MRR)}, and \textbf{Normalized Discounted Cumulative Gain (NDCG)}.
+        \item \textbf{Generation Quality:} Focused on \textbf{Faithfulness} (factuality), \textbf{Relevance} (answering the intent), and \textbf{Non-harmfulness}.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Evaluation Aspects: The "RAG Triad" and Key Abilities}
+Current research emphasizes three quality scores (often referred to as the RAG Triad) and four essential robustness abilities.
+
+\textbf{The Three Quality Scores:}
+\begin{itemize}
+    \item \textbf{Context Relevance:} Evaluates whether the retrieved snippets are precise and specific to the query, minimizing "noise" or extraneous content.
+    \item \textbf{Answer Faithfulness:} Ensures the generated output is derived strictly from the retrieved context without "hallucinating" external or contradictory information.
+    \item \textbf{Answer Relevance:} Measures how well the response directly addresses the user's question.
+\end{itemize}
+
+\textbf{Four Essential Abilities:}
+\begin{itemize}
+    \item \textbf{Information Integration:} The capacity to synthesize insights from multiple disparate documents.
+    \item \textbf{Noise Robustness:} The ability to filter out irrelevant or misleading information within the retrieved set.
+    \item \textbf{Counterfactual Robustness:} The ability to recognize and disregard known inaccuracies or "fake news" injected into documents.
+    \item \textbf{Negative Rejection:} The system's ability to decline answering when the provided documents do not contain the necessary knowledge.
+\end{itemize}
+
 \subsection{Discussion}
+
+\begin{itemize}
+    \item \textbf{RAG vs. Long-Context LLMs}: With modern LLMs supporting contexts over 200,000 tokens, the necessity of RAG is often debated. However, RAG remains superior due to:
+    \begin{itemize}
+        \item \textbf{Efficiency:} Processing massive contexts per request is computationally expensive and slow. RAG's chunk-based retrieval is significantly faster and more cost-effective.
+        \item \textbf{Observability:} RAG provides clear citations and references, whereas Long-Context generation operates as a "black box," making verification difficult.
+    \end{itemize}
+
+    \item \textbf{The Noise Paradox}: Recent studies have identified a "Robustness Paradox": in certain scenarios, including a small amount of irrelevant (noisy) documents can unexpectedly improve model accuracy by over 30\%, suggesting that some noise may act as a regularizer during the reasoning process.
+
+    \item \textbf{Hybrid Approaches}: The most effective current strategy is a hybrid model: using \textbf{Fine-tuning} to adapt the model’s behavior and style, while using \textbf{RAG} to provide updated, dynamic knowledge.
+
+    \item \textbf{Scaling Laws}: While LLMs follow predictable scaling laws, it is unclear if these apply to RAG. Some research suggests an \textbf{"Inverse Scaling Law"}, where smaller, specialized models may outperform larger general-purpose models when equipped with high-quality RAG pipelines.
+
+\end{itemize}

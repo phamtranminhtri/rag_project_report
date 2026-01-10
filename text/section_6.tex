@@ -69,3 +69,61 @@ In this example, the input text is passed to the gTTS library along with the tar
 Overall, Text-to-Speech systems such as gTTS complement language models by enabling multimodal interaction, allowing AI-driven applications to communicate information not only through text but also through natural-sounding speech.
 
 \subsection{Speech-to-text}
+
+Automatic Speech Recognition (ASR), commonly known as Speech-to-Text (STT), is the process of converting spoken language into written text. In this study, two distinct approaches were evaluated: the \textbf{SpeechRecognition} library (utilizing Google Web Speech API) and OpenAI's \textbf{Whisper} model.
+
+\subsubsection{SpeechRecognition with Google Web Speech API}
+The \texttt{SpeechRecognition} library serves as a flexible wrapper for several high-level STT APIs. For this implementation, the \textbf{Google Web Speech API} was utilized.
+
+\begin{itemize}
+    \item \textbf{Mechanism:} The process follows a client-server architecture. The client records or loads an audio file (typically in \texttt{.wav} format), which is then transmitted to Google’s cloud servers. The server processes the audio using proprietary deep learning models and returns the transcribed text in a JSON format.
+    \item \textbf{Technical Characteristics:} Since the heavy computation is handled server-side, the local machine requires minimal processing power. It supports a vast array of languages, including high-accuracy recognition for Vietnamese.
+    \item \textbf{Strengths:} Extremely lightweight for the host device, high inference speed, and minimal setup requirements.
+\end{itemize}
+
+\subsubsection{OpenAI Whisper}
+Whisper is a state-of-the-art, multi-purpose speech recognition model trained on 680,000 hours of multilingual and multitask supervised data. Unlike API-based solutions, Whisper is a \textbf{Transformer-based encoder-decoder} model designed for local deployment.
+
+\begin{itemize}
+    \item \textbf{Architecture:}
+    \begin{itemize}
+        \item \textbf{Input:} The raw audio is first converted into a \textbf{Log-Mel Spectrogram}, which represents the frequency content of the audio over time.
+        \item \textbf{Encoder:} A series of convolutional layers and Transformer blocks encode the audio features into a latent representation.
+        \item \textbf{Decoder:} An autoregressive Transformer decoder predicts the next text token based on the previously generated tokens and the encoder's audio features.
+    \end{itemize}
+    \item \textbf{Strengths:} Excellent understanding of context, automatic punctuation, and the ability to function entirely offline.
+\end{itemize}
+
+\subsubsection{Experimental Comparison and Evaluation}
+Through practical implementation in a demonstration application, both technologies were compared based on performance, resource consumption, and output quality.
+
+\begin{table}[h]
+\centering
+\caption{Comparison: SpeechRecognition API vs. Whisper Model}
+\begin{tabular}{@{}lll@{}}
+\textbf{Feature} & \textbf{SpeechRecognition (Google)} & \textbf{OpenAI Whisper} \\ 
+\textbf{Inference Speed} & Extremely Fast (Cloud-dependent) & Slower (Hardware-dependent) \\
+\textbf{Hardware Req.} & Minimal (Low CPU/RAM) & High (Requires GPU/Strong CPU) \\
+\textbf{Connectivity} & Requires Internet & Offline capable \\
+\textbf{Formatting} & Basic (No punctuation/casing) & Advanced (Punctuation/Casing) \\
+\textbf{Vietnamese} & Excellent recognition & Good, but prone to hallucinations \\
+\textbf{Customization} & None (Closed API) & Support for Fine-tuning \\
+\end{tabular}
+\end{table}
+
+\textbf{Pros and Cons Analysis:}
+\begin{itemize}
+    \item \textbf{SpeechRecognition:}
+    \begin{itemize}
+        \item \textit{Pros:} Ideal for low-end hardware; exceptional Vietnamese recognition with zero local training.
+        \item \textit{Cons:} Strictly requires an internet connection; limited by request quotas; lacks advanced text formatting in the free tier.
+    \end{itemize}
+    \item \textbf{Whisper:}
+    \begin{itemize}
+        \item \textit{Pros:} Provides human-like transcriptions with proper capitalization and grammar; provides privacy through local processing.
+        \item \textit{Cons:} Computationally "heavy"; may suffer from \textit{hallucinations} (generating text when there is only background noise).
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Conclusion for Prototype Implementation}
+Based on the experimental results, \textbf{SpeechRecognition (Google Web Speech API)} was selected for the final demonstration. This decision was driven by its \textbf{ease of integration}, \textbf{high inference speed on low-resource hardware}, and \textbf{superior Vietnamese recognition} without the need for complex local environment configurations. While Whisper offers higher contextual quality, its hardware demands outweigh its benefits for this specific lightweight application demo.
