@@ -1,1 +1,9 @@
 \section{Conclusion}
+
+In this project, we have successfully designed and implemented an AI Agent chatbot specializing in the music domain, leveraging the power of LLM and RAG. By integrating LangChain, a vector database constructed from 76 Wikipedia articles, and speech interfaces (Text-to-Speech and Speech-to-Text), we created an interactive system capable of understanding and answering complex user queries with contextually relevant information.
+
+Our theoretical exploration covered the fundamental building blocks of modern AI, including Artificial Neural Networks, Transformer architectures, and the evolution of LLMs. We delved into the specifics of RAG, examining advanced techniques such as reranking and reasoning to overcome the limitations of standard vector-based retrieval.
+
+The evaluation of our system demonstrated the effectiveness of the RAG approach. The system achieved sub-second retrieval times and maintained consistent relevance scores, with cosine similarity averaging between 0.7 and 0.75. The "LLM-as-a-Judge" evaluation, complemented by manual inspection, confirmed that the retrieved context significantly enhanced the quality and accuracy of the generated responses compared to a standalone model.
+
+Looking ahead, there are several avenues for future improvement. Expanding the knowledge base beyond the initial set of Wikipedia articles would broaden the agent's expertise. Implementing more sophisticated reranking algorithms and exploring reinforcement learning techniques could further refine retrieval accuracy. Additionally, optimizing the latency of the speech interfaces would contribute to a more seamless real-time user experience. Overall, this project validates the potential of domain-specific RAG agents in bridging the gap between general-purpose LLMs and specialized information needs.

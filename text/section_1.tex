@@ -1,1 +1,39 @@
 \section{Introduction}
+
+\subsection{Background and Motivation}
+
+In recent years, the field of Artificial Intelligence has witnessed a paradigm shift with the emergence of Large Language Models (LLMs) such as GPT-4, Gemini, and Llama. These models, built upon the Transformer architecture, have demonstrated remarkable capabilities in natural language understanding, generation, and reasoning. They can draft emails, write code, and even engage in complex conversations that mimic human interaction.
+
+Despite their impressive performance, LLMs face inherent limitations. One significant challenge is "hallucination," where models generate plausible but factually incorrect information. Additionally, purely parametric models are limited by their training data cut-off dates and lack access to private or real-time proprietary data. For specialized domains, such as a dedicated music platform, generic LLMs may not provide specific, deep, or curated knowledge required to satisfy user queries accurately.
+
+\subsection{Problem Statement}
+
+To address these limitations, Retrieval-Augmented Generation (RAG) has emerged as a powerful framework. By grounding the generation process in external, verifiable knowledge sources, RAG significantly reduces hallucinations and allows models to access up-to-date information without the need for frequent retraining.
+
+Furthermore, user interaction with AI systems is evolving beyond text-based interfaces. The integration of Speech-to-Text (STT) and Text-to-Speech (TTS) technologies enables more natural, hands-free, and accessible communication. Building a comprehensive AI system that combines advanced retrieval mechanisms with multi-modal interaction capabilities represents a significant engineering challenge that requires integrating various state-of-the-art components.
+
+% \subsection{Project Scope and Objectives}
+
+% This project, titled \textbf{"Research and build AI chatbots using Retrieval-Augmented Generation for a music-related website, with Speech-to-Text and Text-to-Speech integration"}, aims to develop a sophisticated conversational agent tailored for the music domain. The primary objectives of this project are:
+
+% \begin{enumerate}
+%     \item To research and understand the theoretical foundations of modern AI, including ANNs, Transformers, and Agents.
+%     \item To investigate the RAG framework, ranging from Naive implementations to advanced techniques like Reranking and Reasoning.
+%     \item To implement a functional AI Agent using LangChain that can retrieve information from a curated music knowledge base.
+%     \item To enhance user experience by integrating Speech-to-Text and Text-to-Speech capabilities for voice-based interaction.
+%     \item To evaluate the system's performance in terms of retrieval accuracy and response relevance.
+% \end{enumerate}
+
+\subsection{Report Structure}
+
+The remainder of this report is organized as follows:
+
+\begin{itemize}
+    \item \textbf{Section 2} provides the theoretical prerequisites, covering Artificial Neural Networks, Transformer architectures, and Large Language Models.
+    \item \textbf{Section 3} introduces the concepts of AI Agents, Universal RAG (URAG), and the LangChain framework.
+    \item \textbf{Section 4} presents a survey of Retrieval-Augmented Generation, detailing the standard "Retrieve-Read" pipeline.
+    \item \textbf{Section 5} discusses advanced RAG techniques, such as Reranking, to improve retrieval quality and reduce noise.
+    \item \textbf{Section 6} details the implementation of our music chatbot, utilizing LangChain, Wikipedia data loaders, and voice technologies.
+    \item \textbf{Section 7} presents the evaluation methodology and results, using metrics like Cosine Similarity and LLM-as-a-Judge.
+    \item \textbf{Section 8} concludes the report and discusses potential future improvements.
+\end{itemize}
