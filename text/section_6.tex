@@ -1,5 +1,7 @@
 \section{Implementation: LangChain, Text-to-speech, Speech-to-text}
 
+The full implementation code can be accessed at \url{https://github.com/phamtranminhtri/music_rag}
+
 \subsection{Building an AI Agent Chatbot with LangChain}
 
 We implement AI agent chatbot using the LangChain framework, designed to support a music-related website through Retrieval-Augmented Generation (RAG) combined with speech-based interaction. LangChain enables the construction of agentic systems by integrating large language models (LLMs) with external tools, memory, and retrieval mechanisms, allowing the chatbot to reason, decide actions, and iteratively solve user queries.
@@ -127,3 +129,34 @@ Through practical implementation in a demonstration application, both technologi
 
 \subsubsection{Conclusion for Prototype Implementation}
 Based on the experimental results, \textbf{SpeechRecognition (Google Web Speech API)} was selected for the final demonstration. This decision was driven by its \textbf{ease of integration}, \textbf{high inference speed on low-resource hardware}, and \textbf{superior Vietnamese recognition} without the need for complex local environment configurations. While Whisper offers higher contextual quality, its hardware demands outweigh its benefits for this specific lightweight application demo.
+
+\subsection{Python Flask app for the chatbot}
+
+% \subsection{System Architecture}
+
+The application is built as a web-based conversational agent specifically designed for music-related queries. The architecture leverages the Flask microframework for the backend, orchestrating interaction between the user interface, external APIs, and a Retrieval-Augmented Generation (RAG) pipeline. The system components are detailed below:
+
+\subsubsection{Backend Core}
+The backend is implemented in Python using Flask. It exposes several RESTful endpoints to handle user interactions:
+\begin{itemize}
+    \item \texttt{/} (GET): Serves the main web interface and initializes a unique session identifier for conversation history tracking.
+    \item \texttt{/chat} (POST): The primary endpoint for processing text-based user queries. It invokes the LangChain agent to generate responses.
+    \item \texttt{/stt} (POST): Handles Speech-to-Text conversion. It accepts audio files (WebM format), converts them to WAV using \textit{pydub}, and utilizes the \textit{SpeechRecognition} library with the Google Speech Recognition API to transcribe user speech.
+    \item \texttt{/tts} (POST): Handles Text-to-Speech conversion. It detects the language of the agent's response using \textit{langdetect} and synthesizes audio using the Google Text-to-Speech (\textit{gTTS}) library.
+\end{itemize}
+
+\subsubsection{Conversational Agent \& RAG Pipeline}
+The core intelligence is powered by \textbf{LangChain} and the \textbf{Google Gemini 2.5 Flash} model. The agent is configured with a persistent memory mechanism (\texttt{InMemorySaver}) to maintain context within a session. The system employs a decision-making strategy defined in its system prompt to select between three distinct tools:
+
+\begin{enumerate}
+    \item \textbf{Context Retrieval (RAG)}: 
+    For queries regarding classical music or established knowledge, the agent utilizes a local \textbf{Chroma} vector database. Queries are embedded using \texttt{GoogleGenerativeAIEmbeddings} (model: \texttt{gemini-embedding-001}) to perform similarity searches against a pre-indexed collection of music-related Wikipedia documents.
+    
+    \item \textbf{Web Search}: 
+    For current events or information not present in the local database, the agent employs \textit{DuckDuckGoSearchResults} to perform live web searches.
+    
+    \item \textbf{Web Loader}: 
+    When specific external web pages are identified as satisfied sources, this tool utilizes \texttt{WebBaseLoader} to scrape and ingest the full textual content of the URL for synthesis.
+\end{enumerate}
+
+The agent logic prioritizes the local RAG tool for efficiency and reliability, falling back to web search tools only when necessary information is absent or requires real-time data.
